@@ -1,0 +1,14 @@
+services:
+  mountedgames.logic:
+    image: ${DOCKER_REGISTRY-}mountedgameslogic
+    build:
+      context: .
+      dockerfile: MountedGames.Logic/Dockerfile
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=Sigma123
+    ports:
+        - "1433:1433"
