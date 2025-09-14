@@ -10,6 +10,8 @@ namespace MountedGames.Logic.Data
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Event> Events { get; set; }
+
         // OnModelCreating nur FÜR:
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
