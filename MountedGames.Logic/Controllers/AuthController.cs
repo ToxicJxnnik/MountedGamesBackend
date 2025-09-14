@@ -32,7 +32,8 @@ namespace MountedGames.Logic.Controllers
                     Email = request.Email,
                     PasswordHash = hashedPassword,
                     FirstName = request.FirstName,
-                    LastName = request.LastName
+                    LastName = request.LastName,
+                    Role = request.Role.ToLower()
                 };
 
                 context.Users.Add(user);
@@ -93,12 +94,48 @@ namespace MountedGames.Logic.Controllers
             }
         }
 
+        // Test endpoint - only for authenticated users
         [Authorize]
         [HttpGet]
-        [Route("dane")]
-        public IActionResult GetDane()
+        [Route("profile")]
+        public IActionResult GetProfile()
         {
-            return Ok("Seas Dane");
+            var userRole = User.FindFirst("role")?.Value;
+            var userName = User.FindFirst("firstName")?.Value;
+
+            return Ok(new
+            {
+                message = $"Hello {userName}!",
+                role = userRole,
+                userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            });
+        }
+
+        // Test endpoint - only for organizers
+        [Authorize(Roles = UserRoles.Organizer)]
+        [HttpGet]
+        [Route("organizer-only")]
+        public IActionResult OrganizerOnly()
+        {
+            return Ok("This endpoint is only accessible by organizers");
+        }
+
+        // Test endpoint - only for admins
+        [Authorize(Roles = UserRoles.Admin)]
+        [HttpGet]
+        [Route("admin-only")]
+        public IActionResult AdminOnly()
+        {
+            return Ok("This endpoint is only accessible by admins");
+        }
+
+        // Test endpoint - multiple roles allowed
+        [Authorize(Roles = $"{UserRoles.Organizer},{UserRoles.Judge}")]
+        [HttpGet]
+        [Route("organizer-or-judge")]
+        public IActionResult OrganizerOrJudge()
+        {
+            return Ok("This endpoint is accessible by organizers and judges");
         }
     }
 }

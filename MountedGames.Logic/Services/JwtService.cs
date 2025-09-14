@@ -22,6 +22,7 @@ namespace MountedGames.Logic.Services
             var claims = new[]
             {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  // User ID
+            new Claim(ClaimTypes.Role, user.Role),                     // Role
             new Claim(ClaimTypes.Email, user.Email),                   // Email
             new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"), // Name
             new Claim("firstName", user.FirstName),                    // Custom Claims
@@ -64,8 +65,7 @@ namespace MountedGames.Logic.Services
                     ClockSkew = TimeSpan.Zero  // Keine Toleranz für abgelaufene Token
                 };
 
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
-                return principal;
+                return tokenHandler.ValidateToken(token, validationParameters, out _); ;
             }
             catch
             {
