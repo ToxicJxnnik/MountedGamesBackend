@@ -16,4 +16,5 @@ namespace MountedGames.Logic.Services
         {
             races[eventId].UpdateHorseMan(new HorseMan(), position);
         }
+    }
 }
