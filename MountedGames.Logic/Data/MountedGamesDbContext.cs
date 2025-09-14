@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MountedGames.Logic.Models;
+using MountedGames.Logic.Models.Event;
 
 namespace MountedGames.Logic.Data
 {

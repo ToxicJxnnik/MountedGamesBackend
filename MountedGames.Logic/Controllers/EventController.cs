@@ -1,26 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MountedGames.Logic.Data;
 using MountedGames.Logic.Models;
+using MountedGames.Logic.Models.Event;
 
 namespace MountedGames.Logic.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EventController : ControllerBase
+public class EventController(MountedGamesDbContext db) : ControllerBase
 {
-    private readonly MountedGamesDbContext _db;
-
-    public EventController(MountedGamesDbContext db)
-    {
-        _db = db;
-    }
-
     // Alle Turniere abrufen
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var events = await _db.Events.OrderBy(e => e.StartDate).ToListAsync();
+        var events = await db.Events.OrderBy(e => e.StartDate).ToListAsync();
         return Ok(events);
     }
 
@@ -28,12 +23,14 @@ public class EventController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var evnt = await _db.Events.FindAsync(id);
+        var evnt = await db.Events.FindAsync(id);
         return evnt is null ? NotFound() : Ok(evnt);
     }
 
     // Neues Turnier anlegen
+    [Authorize(Roles = UserRoles.Organizer)]
     [HttpPost]
+    [Route("create")]
     public async Task<IActionResult> Create([FromBody] Event input)
     {
         if (string.IsNullOrWhiteSpace(input.Title))
@@ -41,8 +38,8 @@ public class EventController : ControllerBase
         if (input.EndDate < input.StartDate)
             return BadRequest("EndDate must be after StartDate.");
 
-        _db.Events.Add(input);
-        await _db.SaveChangesAsync();
+        db.Events.Add(input);
+        await db.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetById), new { id = input.Id }, input);
     }
