@@ -2,6 +2,7 @@
   "profiles": {
     "Docker Compose": {
       "commandName": "DockerCompose",
+      "launchBrowser": false,
       "commandVersion": "1.0",
       "serviceActions": {
         "mountedgames.logic": "StartDebugging"
