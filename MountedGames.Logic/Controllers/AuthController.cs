@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MountedGames.Logic.Data;
 using MountedGames.Logic.Models;
@@ -8,10 +9,11 @@ using MountedGames.Logic.Services;
 namespace MountedGames.Logic.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
     public class AuthController(MountedGamesDbContext context, JwtService jwtService) : ControllerBase
     {
         [HttpPost]
-        [Route("api/auth/register")]
+        [Route("register")]
         public ActionResult<AuthResponse> Register(RegisterRequest request)
         {
             try
@@ -60,7 +62,7 @@ namespace MountedGames.Logic.Controllers
         }
 
         [HttpPost]
-        [Route("api/auth/login")]
+        [Route("login")]
         public ActionResult<AuthResponse> Login(LoginRequest request)
         {
             try
@@ -89,6 +91,14 @@ namespace MountedGames.Logic.Controllers
             {
                 return StatusCode(500, new { error = ex.Message, stackTrace = ex.StackTrace });
             }
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("dane")]
+        public IActionResult GetDane()
+        {
+            return Ok("Seas Dane");
         }
     }
 }
