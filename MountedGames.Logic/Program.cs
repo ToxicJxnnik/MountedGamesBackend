@@ -19,6 +19,17 @@ namespace MountedGames.Logic
                 builder.WebHost.UseUrls("http://0.0.0.0:8080", "http://0.0.0.0:8081");
             }
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()         // Important for SignalR
+                        .SetIsOriginAllowed(_ => true);  // Allow any origin temporarily
+                });
+            });
+
             builder.Services.AddSingleton<JwtService>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -51,6 +62,8 @@ namespace MountedGames.Logic
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+
+            app.UseCors("AllowAll");
 
             app.Run();
         }

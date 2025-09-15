@@ -37,7 +37,7 @@ namespace MountedGames.Logic.Hubs
             return false;
         }*/
 
-        public async Task<> UpdateHorseManPosition(int eventId, int horseManId, int position)
+        public async Task UpdateHorseManPosition(int eventId, int horseManId, int position)
         {
             raceStateManager.UpdateHorseManPosition(eventId, horseManId, position);
         }
