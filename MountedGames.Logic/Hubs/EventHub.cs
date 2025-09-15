@@ -10,7 +10,7 @@ namespace MountedGames.Logic.Hubs
     [Authorize] // Requires JWT authentication
     public class EventHub(EventService eventService, RaceStateManager raceStateManager) : Hub
     {
-        public async Task<bool> StartEvent(int eventId)
+        public async Task<bool> StartRace(int eventId, int raceId)
         {
             if (eventService.StartEvent(eventId))
             {

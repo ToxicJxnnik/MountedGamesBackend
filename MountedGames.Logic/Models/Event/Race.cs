@@ -1,9 +1,9 @@
 ﻿namespace MountedGames.Logic.Models.Event
 {
-    public class RaceState
+    public class Race
     {
         HorseMan[] HorseMen { get; set; }
-        public RaceState(HorseMan[] horseMen)
+        public Race(HorseMan[] horseMen)
         {
             for (int i = 0; i < horseMen.Length; i++)
             {

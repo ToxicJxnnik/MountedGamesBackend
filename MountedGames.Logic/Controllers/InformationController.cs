@@ -80,11 +80,11 @@ namespace MountedGames.Logic.Controllers
                     Console.WriteLine($"Updated Club to: {request.Club}");
                 }
 
-                /*if (request.DateOfBirth.HasValue)
+                if (request.DateOfBirth.HasValue)
                 {
                     existingUser.DateOfBirth = request.DateOfBirth.Value;
                     Console.WriteLine($"Updated DateOfBirth to: {request.DateOfBirth}");
-                }*/
+                }
 
                 if (!string.IsNullOrEmpty(request.PhoneNumber))
                 {

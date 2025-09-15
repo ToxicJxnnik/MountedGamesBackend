@@ -5,11 +5,11 @@ namespace MountedGames.Logic.Services
 {
     public class RaceStateManager
     {
-        ConcurrentDictionary<int, RaceState> races = [];
+        ConcurrentDictionary<int, Race> races = [];
 
         public void AddRace(int eventId, HorseMan[] horseMen)
         {
-            races[eventId] = new RaceState(horseMen);
+            races[eventId] = new Race(horseMen);
         }
 
         public void UpdateHorseManPosition(int eventId, int horseManId, int position)
