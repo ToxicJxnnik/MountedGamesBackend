@@ -27,10 +27,13 @@ namespace MountedGames.Logic.Services
                 var response = await _httpClient.SendAsync(request);
                 if (!response.IsSuccessStatusCode)
                 {
+                    Console.WriteLine($"Auth0 API call failed: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
                     return null;
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Auth0 response: {json}"); // Debug log
+
                 var userInfo = JsonSerializer.Deserialize<Auth0UserInfo>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
@@ -41,6 +44,7 @@ namespace MountedGames.Logic.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error validating Auth0 token: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return null;
             }
         }
@@ -63,12 +67,59 @@ namespace MountedGames.Logic.Services
                 return existingUser;
             }
 
+            // Extract first and last name with better fallback logic
+            string firstName = "";
+            string lastName = "";
+
+            // Try to use given_name and family_name first
+            if (!string.IsNullOrEmpty(auth0User.GivenName))
+            {
+                firstName = auth0User.GivenName;
+            }
+
+            if (!string.IsNullOrEmpty(auth0User.FamilyName))
+            {
+                lastName = auth0User.FamilyName;
+            }
+
+            // If we don't have both names, try to parse the full name
+            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            {
+                if (!string.IsNullOrEmpty(auth0User.Name))
+                {
+                    var nameParts = auth0User.Name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (nameParts.Length > 0)
+                    {
+                        if (string.IsNullOrEmpty(firstName))
+                            firstName = nameParts[0];
+
+                        if (string.IsNullOrEmpty(lastName) && nameParts.Length > 1)
+                            lastName = string.Join(" ", nameParts.Skip(1));
+                    }
+                }
+            }
+
+            // If we still don't have names, use nickname or email prefix as fallback
+            if (string.IsNullOrEmpty(firstName))
+            {
+                firstName = !string.IsNullOrEmpty(auth0User.Nickname)
+                    ? auth0User.Nickname
+                    : auth0User.Email.Split('@')[0];
+            }
+
+            if (string.IsNullOrEmpty(lastName))
+            {
+                lastName = ""; // Leave empty if we can't determine it
+            }
+
+            Console.WriteLine($"Creating user: {firstName} {lastName} ({auth0User.Email})"); // Debug log
+
             // Create new user from Auth0 info
             var newUser = new User
             {
                 Email = auth0User.Email,
-                FirstName = auth0User.GivenName ?? auth0User.Name?.Split(' ').FirstOrDefault() ?? "",
-                LastName = auth0User.FamilyName ?? auth0User.Name?.Split(' ').Skip(1).FirstOrDefault() ?? "",
+                FirstName = firstName,
+                LastName = lastName,
                 Role = UserRoles.Horseman, // Default role
                 Auth0UserId = auth0User.Sub,
                 SocialProvider = auth0User.Sub,

@@ -30,6 +30,8 @@ namespace MountedGames.Logic
                 });
             });
 
+            builder.Services.AddHttpClient();
+
             builder.Services.AddSingleton<JwtService>();
             builder.Services.AddScoped<Auth0Service>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
