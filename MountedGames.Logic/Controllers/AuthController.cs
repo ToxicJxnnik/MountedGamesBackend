@@ -10,7 +10,7 @@ namespace MountedGames.Logic.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(MountedGamesDbContext context, JwtService jwtService) : ControllerBase
+    public class AuthController(MountedGamesDbContext context, JwtService jwtService, Auth0Service auth0Service) : ControllerBase
     {
         [HttpPost]
         [Route("register")]
@@ -86,6 +86,52 @@ namespace MountedGames.Logic.Controllers
                     },
                     Token = token
                 };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, stackTrace = ex.StackTrace });
+            }
+        }
+
+        [HttpPost]
+        [Route("social-login")]
+        public async Task<ActionResult<AuthResponse>> SocialLogin(SocialLoginRequest request)
+        {
+            try
+            {
+                // Validate Auth0 access token and get user info
+                var auth0User = await auth0Service.ValidateAuth0Token(request.AccessToken);
+                if (auth0User == null)
+                {
+                    return Unauthorized("Invalid or expired access token");
+                }
+
+                // Get or create user in your database
+                var user = await auth0Service.GetOrCreateUserFromAuth0(auth0User);
+
+                // Override role if provided
+                if (!string.IsNullOrEmpty(request.Role) && UserRoles.IsValidRole(request.Role))
+                {
+                    user.Role = request.Role.ToLower();
+                    await context.SaveChangesAsync();
+                }
+
+                // Generate YOUR JWT token (same as other endpoints)
+                string token = jwtService.GenerateToken(user);
+
+                AuthResponse response = new()
+                {
+                    User = new()
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email
+                    },
+                    Token = token
+                };
+
                 return Ok(response);
             }
             catch (Exception ex)

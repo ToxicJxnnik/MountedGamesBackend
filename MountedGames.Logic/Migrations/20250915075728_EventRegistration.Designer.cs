@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MountedGames.Logic.Data;
 
@@ -11,9 +12,11 @@ using MountedGames.Logic.Data;
 namespace MountedGames.Logic.Migrations
 {
     [DbContext(typeof(MountedGamesDbContext))]
-    partial class MountedGamesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250915075728_EventRegistration")]
+    partial class EventRegistration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

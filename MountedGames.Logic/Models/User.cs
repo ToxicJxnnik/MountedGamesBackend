@@ -8,6 +8,8 @@
         public string LastName { get; set; }
         public string Email { get; set; }
         public string? PasswordHash { get; set; }
+        public string? Auth0UserId { get; set; }
+        public string? SocialProvider { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Nationality { get; set; }
         public string? PhoneNumber { get; set; }
